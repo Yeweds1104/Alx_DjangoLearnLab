@@ -1,5 +1,10 @@
 To retrieve the book attributes run below command in interactive shell
-To display id
+
+> > > book = Book.objects.get(id=1)
+> > > book = Book.objects.get(title="1984")
+> > > book = Book.objects.get(author="George Orwell")
+> > > book = Book.objects.get(publication_year="1949")
+> > > To display id
 
 > > > book.id
 
