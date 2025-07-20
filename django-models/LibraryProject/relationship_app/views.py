@@ -2,6 +2,13 @@ from django.shortcuts import render, get_object_or_404
 from .models import Book
 from .models import Library
 from django.views.generic.detail import DetailView
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.shortcuts import redirect
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LogoutView
+from django.contrib import messages
 
 # Create your views here.
 def list_books(request):
@@ -16,10 +23,23 @@ class LibraryDetailView(DetailView):
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
     
-    # def get_context_data(self, **kwargs):
-    #     # Add additional context data specific to the library detail view
-    #     context = super().get_context_data(**kwargs) # get the default context data
-    #     library = self.get_object() # retrieve the current library instance
-    #     context['library'] = library # add the library instance to the context
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Registration successful.')
+            return redirect('list_books')
+        
+    else:
+        form = UserCreationForm()
+    return render(request, 'relationship_app/register.html', {'form': form})
+
+class CustomLoginView(LoginView):
+    template_name = 'relationship_app/login.html'
+    
+class CustomLogoutView(LogoutView):
+    template_name = 'relationship_app/logout.html'
 
   
