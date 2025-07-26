@@ -1,0 +1,10 @@
+<!-- templates/bookshelf/book_form.html -->
+{% extends 'base.html' %} {% block content %}
+<h2>{{ form.instance.pk|yesno:"Edit Book,Add Book" }}</h2>
+
+<form method="post">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">💾 Save</button>
+  <a href="{% url 'book_list' %}">🔙 Back</a>
+</form>
+{% endblock %}
