@@ -8,6 +8,7 @@ class BookAPITestCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
         self.author = Author.objects.create(name='Test Author')
         
         self.book1 = Book.objects.create(title='Django Unchained', publication_year=2012, author=self.author)
