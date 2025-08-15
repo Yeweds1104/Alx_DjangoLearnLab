@@ -8,35 +8,41 @@
   </head>
   <body>
     <header class="header">
-      <nav>
-        <ul>
-          <li><a href="{% url 'home' %}">Home</a></li>
-          <li><a href="{% url 'posts' %}">Blog Posts</a></li>
-          <li><a href="{% url 'login' %}">Login</a></li>
-          <li><a href="{% url 'register' %}">Register</a></li>
-        </ul>
-      </nav>
+      <div class="container">
+        <h1><a href="{% url 'home' %}">Django Blog</a></h1>
+        <nav class="auth-nav">
+          <div class="user-actions">
+            {% if user.is_authenticated %}
+            <p>Welcome, {{ user.username }}!</p>
+            <a href="{% url 'profile' %}" class="auth-link">Profile</a>
+            <a href="{% url 'logout' %}" class="auth-link">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="auth-link">Login</a>
+            <a href="{% url 'register' %}" class="auth-link">Register</a>
+            {% endif %}
+          </div>
+        </nav>
+      </div>
     </header>
 
-    <div class="user-actions">
-      {% if user.is_authenticated %}
-      <p>Welcome, {{ user.username }}!</p>
-      <a href="{% url 'profile' %}">Profile</a>
-      <a href="{% url 'logout' %}">Logout</a>
-      {% else %}
-      <a href="{% url 'login' %}">Login</a>
-      <a href="{% url 'register' %}">Register</a>
+    <main class="container">
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
       {% endif %}
-    </div>
 
-    <div class="content">
-      {% block content %}
-      <!-- Page-specific content goes here -->
-      {% endblock %}
-    </div>
+      <div class="content">
+        {% block content %}
+        <!-- Page-specific content goes here -->
+        {% endblock %}
+      </div>
+    </main>
 
     <footer>
-      <p>&copy; 2024 Django Blog</p>
+      <p>&copy; 2025 Django Blog</p>
     </footer>
 
     <script src="{% static 'blog/js/scripts.js' %}"></script>
