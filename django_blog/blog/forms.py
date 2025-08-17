@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import UserChangeForm
-from .models import Profile
+from .models import Profile, Post
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -29,3 +30,35 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['bio', 'location', 'birth_date']
+        
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'content']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['title'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Enter a catchy title ...',
+        })
+        self.fields['content'].widget.attrs.update({
+            'class': 'form-control',
+            'rows': 8,
+            'placeholder': 'Write your post content here ...',
+        })
+    def clean_title(self):
+        title = self.cleaned_data.get('title')
+        if len(title) < 10:
+            raise ValidationError('Title must be at least 10 characters long.')
+        return title
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        if len(content) < 50:
+            raise ValidationError('Content must be at least 50 characters long.')
+        return content
