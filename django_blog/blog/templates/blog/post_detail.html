@@ -21,5 +21,55 @@
     >
   </div>
   {% endif %}
+
+  <div class="comments-section mt-5">
+    <h3>Comments ({{ post.comments.count }})</h3>
+
+    {% for comment in comments %}
+    <div class="comment card mb-3">
+      <div class="card-body">
+        <div class="comment-meta d-flex justify-content-between mb-2">
+          <span class="comment-author font-weight-bold"
+            >{{ comment.author.username }}</span
+          >
+          <span class="comment-date text-muted"
+            >{{ comment.created_at|date:"F j, Y, P" }}</span
+          >
+        </div>
+        <p class="comment-content">{{ comment.content }}</p>
+
+        {% if user == comment.author %}
+        <div class="comment-actions">
+          <a
+            href="{% url 'comment_update' pk=comment.pk %}"
+            class="btn btn-sm btn-outline-secondary"
+            >Edit</a
+          >
+          <a
+            href="{% url 'comment_delete' pk=comment.pk %}"
+            class="btn btn-sm btn-outline-danger"
+            >Delete</a
+          >
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% empty %}
+    <p>No comments yet. Be the first to comment!</p>
+    {% endfor %} {% if user.is_authenticated %}
+    <div class="add-comment mt-4">
+      <h4>Add a comment</h4>
+      <form method="post" action="{% url 'comment_create' pk=post.pk %}">
+        {% csrf_token %} {{ comment_form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+    {% else %}
+    <p>
+      <a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to leave a
+      comment.
+    </p>
+    {% endif %}
+  </div>
 </article>
 {% endblock %}

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import UserChangeForm
-from .models import Profile, Post
+from .models import Profile, Post, Comment
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
@@ -61,4 +61,28 @@ class PostForm(forms.ModelForm):
         content = self.cleaned_data.get('content')
         if len(content) < 50:
             raise ValidationError('Content must be at least 50 characters long.')
+        return content
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Write your comment here ...',}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['content'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Write your comment here ...',
+        })
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        if len(content) < 5:
+            raise ValidationError('Comment must be at least 5 characters long.')
         return content

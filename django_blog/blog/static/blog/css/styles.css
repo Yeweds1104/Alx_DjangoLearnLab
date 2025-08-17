@@ -265,3 +265,34 @@ footer {
     font-size: 14px;
     margin-top: 0.5rem;
 }
+.comments-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.comment {
+    border-left: 3px solid #007bff;
+}
+
+.comment-meta {
+    font-size: 0.9rem;
+}
+
+.comment-content {
+    white-space: pre-line;
+}
+
+.comment-actions {
+    margin-top: 0.5rem;
+}
+
+.comment-actions a {
+    margin-right: 0.5rem;
+}
+
+.add-comment {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.25rem;
+}
