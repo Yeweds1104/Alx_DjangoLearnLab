@@ -42,11 +42,12 @@ class TagField(forms.CharField):
 class PostForm(forms.ModelForm):
     tags = TagField(
         required=False,
-        widget=TagWidget(attrs={
-            'class': 'form-control',
-            'placeholder': 'Comma-separated tags',
-            'data-role': 'tagsinput'
-        }),
+         widget=TagWidget(#attrs={
+        #     'class': 'form-control',
+        #     'placeholder': 'Comma-separated tags',
+        #     'data-role': 'tagsinput'
+        # }
+     ),
         help_text="Enter tags separated by commas"
     )
     class Meta:
