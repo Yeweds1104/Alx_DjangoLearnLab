@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Comment
+from .models import Comment, Tag, Post, Profile
 
 # Register your models here.
 @admin.register(Comment)
@@ -12,3 +12,8 @@ class CommentAdmin(admin.ModelAdmin):
     def approve_comments(self, request, queryset):
         queryset.update(active=True)
         
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug')
+    prepopulated_fields = {'slug': ('name',)}
+    search_fields = ('name',)

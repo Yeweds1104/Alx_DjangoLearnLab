@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import UserChangeForm
-from .models import Profile, Post, Comment
+from .models import Profile, Post, Comment, Tag
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
@@ -32,9 +32,14 @@ class ProfileUpdateForm(forms.ModelForm):
         fields = ['bio', 'location', 'birth_date']
         
 class PostForm(forms.ModelForm):
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+    )
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'tags']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
@@ -86,3 +91,13 @@ class CommentForm(forms.ModelForm):
         if len(content) < 5:
             raise ValidationError('Comment must be at least 5 characters long.')
         return content
+    
+class SearchForm(forms.Form):
+    query = forms.CharField(
+        label='',
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Search posts...',
+            'class': 'form-control'
+        })
+    )

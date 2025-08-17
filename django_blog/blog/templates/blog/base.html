@@ -22,6 +22,21 @@
             <a href="{% url 'register' %}" class="auth-link">Register</a>
             {% endif %}
           </div>
+          <form method="get" action="{% url 'post_search' %}" class="d-flex">
+            <div class="input-group">
+              <input
+                type="text"
+                name="query"
+                class="form-control"
+                placeholder="Search posts..."
+                value="{{ request.GET.query }}"
+                aria-label="Search"
+              />
+              <button class="btn btn-outline-success" type="submit">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </form>
         </nav>
       </div>
     </header>

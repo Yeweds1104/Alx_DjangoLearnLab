@@ -4,12 +4,28 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from .forms import UserUpdateForm, ProfileUpdateForm, CommentForm, PostForm, RegisterForm
+from .forms import UserUpdateForm, ProfileUpdateForm, CommentForm, PostForm, RegisterForm, SearchForm
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post, Comment 
+from .models import Post, Comment, Tag
+from django.db.models import Q
 
 # Create your views here.
+class PostsByTagView(ListView):
+    model = Post
+    template_name = 'blog/post_by_tag.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag,slug=self.kwargs['tag_slug'])
+        return Post.objects.filter(tags=self.tag, published_date__isnull=False).order_by('-published_date')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag
+        return context
+    
 #@login_required
 def profile(request):
     if request.method == 'POST':
@@ -147,3 +163,26 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def get_success_url(self):
         return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
+    
+class PostSearchView(ListView):
+    model = Post
+    template_name = 'blog/post_search.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_queryset(self):
+        query = self.request.GET.get('query', '')
+        if query:
+            # Search in title, content, and tags
+            return Post.objects.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct().order_by('-published_date')
+        return Post.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('query', '')
+        context['form'] = SearchForm(initial={'query': context['query']})
+        return context

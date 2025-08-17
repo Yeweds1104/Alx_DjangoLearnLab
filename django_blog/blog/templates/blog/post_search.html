@@ -1,0 +1,26 @@
+<!-- blog/templates/blog/post_search.html -->
+{% extends 'blog/base.html' %} {% block content %}
+<div class="search-container">
+  <h1>Search Results</h1>
+
+  <form method="get" action="{% url 'post_search' %}" class="search-form mb-4">
+    <div class="input-group">
+      {{ form.query }}
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </div>
+  </form>
+
+  {% if query %}
+  <p>Showing results for: <strong>"{{ query }}"</strong></p>
+
+  {% if posts %} {% for post in posts %}
+  <!-- Your post listing template here -->
+  {% endfor %} {% else %}
+  <div class="alert alert-info">No posts found matching your search.</div>
+  {% endif %} {% else %}
+  <div class="alert alert-warning">Please enter a search term.</div>
+  {% endif %}
+</div>
+{% endblock %}
