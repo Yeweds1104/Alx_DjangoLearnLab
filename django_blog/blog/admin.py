@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Comment, Tag, Post, Profile
+from taggit.admin import TagAdmin, TaggedItemInline
 
 # Register your models here.
 @admin.register(Comment)
@@ -17,3 +18,9 @@ class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ('name',)
+    
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    inlines = [TaggedItemInline]
+    list_display = ['title', 'author', 'published_date']
+    filter_horizontal = ['tags']

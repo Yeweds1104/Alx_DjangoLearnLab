@@ -19,6 +19,11 @@
       >Hold Ctrl/Cmd to select multiple tags.</small
     >
   </div>
+  <div class="form-group">
+    <label for="{{ form.tags_input.id_for_label }}">Tags</label>
+    {{ form.tags_input }}
+    <small class="form-text text-muted">{{ form.tags_input.help_text }}</small>
+  </div>
   <button type="submit" class="btn btn-primary">Save</button>
   <a
     href="{% if object %}{% url 'post_detail' object.pk %}{% else %}{% url 'post_list' %}{% endif %}"

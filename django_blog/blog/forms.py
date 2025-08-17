@@ -1,9 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import UserChangeForm
-from .models import Profile, Post, Comment, Tag
+from .models import Profile, Post, Comment
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from taggit.models import Tag
+from taggit.forms import TagWidget
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -30,32 +32,38 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['bio', 'location', 'birth_date']
-        
+
+class TagField(forms.CharField):
+    def clean(self, value):
+        value = super().clean(value)
+        if value:
+            return [tag.strip() for tag in value.split(',') if tag.strip()]
+        return []
 class PostForm(forms.ModelForm):
-    tags = forms.ModelMultipleChoiceField(
-        queryset=Tag.objects.all(),
+    tags_input = TagField(
         required=False,
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Comma-separated tags'
+        }),
+        help_text="Enter tags separated by commas"
     )
     class Meta:
         model = Post
         fields = ['title', 'content', 'tags']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'tags': TagWidget(attrs={
+                'class': 'form-control',
+                'placeholder': 'Comma-separated tags',
+                'data-role': 'tagsinput'  # For Bootstrap Tags Input
+            })
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['title'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Enter a catchy title ...',
-        })
-        self.fields['content'].widget.attrs.update({
-            'class': 'form-control',
-            'rows': 8,
-            'placeholder': 'Write your post content here ...',
-        })
+        if self.instance.pk:
+            self.fields['tags_input'].initial = ', '.join(tag.name for tag in self.instance.tags.all())
+            
     def clean_title(self):
         title = self.cleaned_data.get('title')
         if len(title) < 10:
@@ -67,6 +75,15 @@ class PostForm(forms.ModelForm):
         if len(content) < 50:
             raise ValidationError('Content must be at least 50 characters long.')
         return content
+    def save(self, commit=True):
+        post = super().save(commit=commit)
+        tag_names = self.cleaned_data.get('tags_input', [])
+        post.tags.clear()
+        for name in tag_names:
+            tag, created = Tag.objects.get_or_create(name=name.lower())
+            post.tags.add(tag)
+        
+        return post
 
 class CommentForm(forms.ModelForm):
     class Meta:
