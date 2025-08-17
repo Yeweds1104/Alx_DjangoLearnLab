@@ -40,11 +40,12 @@ class TagField(forms.CharField):
             return [tag.strip() for tag in value.split(',') if tag.strip()]
         return []
 class PostForm(forms.ModelForm):
-    tags_input = TagField(
+    tags = TagField(
         required=False,
-        widget=forms.TextInput(attrs={
+        widget=TagWidget(attrs={
             'class': 'form-control',
-            'placeholder': 'Comma-separated tags'
+            'placeholder': 'Comma-separated tags',
+            'data-role': 'tagsinput'
         }),
         help_text="Enter tags separated by commas"
     )
@@ -52,12 +53,16 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['title', 'content', 'tags']
         widgets = {
-            'tags': TagWidget(attrs={
+            'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Comma-separated tags',
-                'data-role': 'tagsinput'  # For Bootstrap Tags Input
-            })
-        }
+                'placeholder': 'Enter post title...'
+            }),
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 10,
+                'placeholder': 'Write your post content here...'
+            }),
+            }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
