@@ -40,15 +40,15 @@ class TagField(forms.CharField):
             return [tag.strip() for tag in value.split(',') if tag.strip()]
         return []
 class PostForm(forms.ModelForm):
-    tags = TagField(
-        required=False,
-        widget=TagWidget(attrs={
-            'class': 'form-control',
-            'placeholder': 'Comma-separated tags',
-            'data-role': 'tagsinput'
-        }),
-        help_text="Enter tags separated by commas"
-    )
+    # tags = TagField(
+    #     required=False,
+    #     widget=TagWidget(attrs={
+    #         'class': 'form-control',
+    #         'placeholder': 'Comma-separated tags',
+    #         'data-role': 'tagsinput'
+    #     }),
+    #     help_text="Enter tags separated by commas"
+    # )
     class Meta:
         model = Post
         fields = ['title', 'content', 'tags']
@@ -62,7 +62,16 @@ class PostForm(forms.ModelForm):
                 'rows': 10,
                 'placeholder': 'Write your post content here...'
             }),
-            }
+            'tags': TagWidget(attrs={  # This is the TagWidget usage
+                'class': 'form-control',
+                'placeholder': 'Add tags separated by commas',
+                'data-role': 'tagsinput'
+            })
+        }
+        help_texts = {
+            'tags': 'Separate tags with commas'
+        }
+        
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
