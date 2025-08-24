@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -40,3 +40,34 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     
     def get_object(self):
         return self.request.user
+    
+class FollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, username):
+        target_user = get_object_or_404(User, username=username)
+        if target_user == request.user:
+            return Response({'error': "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if request.user in target_user.followers.all():
+            target_user.followers.remove(request.user)
+            action = 'unfollowed'
+        else:
+            target_user.followers.add(request.user)
+            action = 'followed'
+        
+        return Response({'status': f'Successfully {action} {target_user.username}.'}, status=status.HTTP_200_OK)
+    
+class UnfollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, username):
+        target_user = get_object_or_404(User, username=username)
+        if target_user == request.user:
+            return Response({'error': "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if request.user in target_user.followers.all():
+            target_user.followers.remove(request.user)
+            return Response({'status': f'Successfully unfollowed {target_user.username}.'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': f'You are not following {target_user.username}.'}, status=status.HTTP_400_BAD_REQUEST)

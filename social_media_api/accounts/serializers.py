@@ -4,9 +4,11 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
+    followers = serializers.StringRelatedField(many=True, read_only=True)
+    following = serializers.StringRelatedField(many=True, read_only=True)
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'bio', 'profile_picture', 'followers']
+        fields = ['id', 'username', 'email', 'bio', 'profile_picture', 'followers', 'following']
         
 class RegisterSerializer(serializers.ModelSerializer):
     #password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
