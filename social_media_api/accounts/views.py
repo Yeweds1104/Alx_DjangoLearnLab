@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model, authenticate
 from .serializers import UserSerializer, RegisterSerializer
 from .models import CustomUser
+from notifications.models import Notification
 
 # Create your views here.
 class RegisterView(generics.GenericAPIView):
@@ -49,6 +50,11 @@ class FollowUserView(APIView):
         target_user = get_object_or_404(CustomUser, username=username)
         if target_user == request.user:
             return Response({'error': "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            Notification.objects.create(
+            recipient=target_user,
+            actor=request.user,
+            verb="started following you")
         
         if request.user in target_user.followers.all():
             target_user.followers.remove(request.user)
