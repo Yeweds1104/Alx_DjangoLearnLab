@@ -18,7 +18,9 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = False
 SECRET_KEY = env('SECRET_KEY', 'CHANGE_ME_DEV_ONLY')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+PORT = os.getenv("PORT", "8000")
 
 
 # Quick-start development settings - unsuitable for production
